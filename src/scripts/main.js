@@ -138,44 +138,11 @@ function draw() {
   drawLives();
   collisionDetection();
 
-  if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
-    dx = -dx;
-  }
-
-  if (y + dy < ballRadius) {
-    dy = -dy;
-  } else if (y + dy > canvas.height-ballRadius) {
-    if (x > paddleX && x < paddleX + paddleWidth) {
-      dy = -dy;
-    } else {
-      lives--;
-      if(!lives) {
-        alert("GAME OVER");
-        document.location.reload();
-      } else {
-        x = canvas.width/2;
-        y = canvas.height-30;
-        dx = 3;
-        dy = -3;
-        paddleX = (canvas.width-paddleWidth)/2;
-      }
-    }
-  }
-
-  x += dx;
-  y += dy;
-
   if(rightPressed) {
-    paddleX += 7;
-    if (paddleX + paddleWidth > canvas.width){
-        paddleX = canvas.width - paddleWidth;
-    }
+
   }
   else if(leftPressed) {
-    paddleX -= 7;
-    if (paddleX < 0){
-        paddleX = 0;
-    }
+
   }
 
   requestAnimationFrame(draw);
