@@ -1,0 +1,19 @@
+{
+  "name": "orca-web-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholas-ewasiuk/orca-web-game.git"
+  },
+  "author": "nicholas ewasiuk ewasiuk.nick@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nicholas-ewasiuk/orca-web-game/issues"
+  },
+  "homepage": "https://github.com/nicholas-ewasiuk/orca-web-game#readme"
+}
