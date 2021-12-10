@@ -1,11 +1,20 @@
 const canvas = document.getElementById("game-window");
 const ctx = canvas.getContext("2d");
-let x = canvas.width / 2;
-let y = canvas.height - 30;
-const dx = 2;
-const dy = -2;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let x = canvas.width/2;
+let y = canvas.height-30;
+let dx = 2;
+let dy = -2;
 
 const ballRadius = 10;
+
+window.addEventListener("resize", setCanvasSize);
+
+function setCanvasSize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
 
 function drawBall() {
   ctx.beginPath();
@@ -26,6 +35,7 @@ function draw() {
   if (y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
     dy = -dy;
   }
+
   x += dx;
   y += dy;
 
