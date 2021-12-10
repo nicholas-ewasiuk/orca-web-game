@@ -8,6 +8,7 @@ let y = canvas.height-30;
 let dx = 3;
 let dy = -3;
 let lives = 3;
+let score = 0;
 
 const ballRadius = 10;
 
@@ -66,12 +67,31 @@ function collisionDetection() {
   for (let i = 0; i < brickColumnCount; i++) {
     for (let j = 0; j < brickRowCount; j++) {
       let b = bricks[i][j];
-      if (x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight && b.status == 1) {
-        dy = -dy;
-        b.status = 0;
+      if (b.status == 1) {
+        if (x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+          dy = -dy;
+          b.status = 0;
+          score++;
+          if (score == brickRowCount*brickColumnCount) {
+            alert("YOU WIN, CONGRATULATIONS!");
+            document.location.reload();
+          }
+        }
       }
     }
   }
+}
+
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Score: "+score, 8, 20);
+}
+
+function drawLives() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Lives: "+lives, canvas.width-65, 20);
 }
 
 function drawBall() {
@@ -114,6 +134,8 @@ function draw() {
   drawBricks();
   drawBall();
   drawPaddle();
+  drawScore();
+  drawLives();
   collisionDetection();
 
   if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
