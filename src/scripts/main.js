@@ -1,12 +1,13 @@
 const canvas = document.getElementById("game-window");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 600;
+canvas.height = 300;
 
 let x = canvas.width/2;
 let y = canvas.height-30;
-let dx = 2;
-let dy = -2;
+let dx = 3;
+let dy = -3;
+let lives = 3;
 
 const ballRadius = 10;
 const paddleHeight = 10;
@@ -15,7 +16,7 @@ let paddleX = (canvas.width-paddleWidth) / 2;
 let rightPressed = false;
 let leftPressed = false;
 
-window.addEventListener("resize", setCanvasSize);
+//window.addEventListener("resize", setCanvasSize);
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
@@ -69,8 +70,24 @@ function draw() {
     dx = -dx;
   }
 
-  if (y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+  if (y + dy < ballRadius) {
     dy = -dy;
+  } else if (y + dy > canvas.height-ballRadius) {
+    if (x > paddleX && x < paddleX + paddleWidth) {
+      dy = -dy;
+    } else {
+      lives--;
+      if(!lives) {
+        alert("GAME OVER");
+        document.location.reload();
+      } else {
+        x = canvas.width/2;
+        y = canvas.height-30;
+        dx = 3;
+        dy = -3;
+        paddleX = (canvas.width-paddleWidth)/2;
+      }
+    }
   }
 
   x += dx;
