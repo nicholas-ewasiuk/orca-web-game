@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = 600;
 canvas.height = 300;
 
-//Player can change render FPS to suit display
+//Select FPS to suit display
 document.getElementById("fps-select").addEventListener("click", onSelectFPS);
 
 function onSelectFPS(event) {
@@ -25,7 +25,7 @@ function onSelectFPS(event) {
   }
 }
 
-//Keyboard inputs
+//Keyboard Input
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
