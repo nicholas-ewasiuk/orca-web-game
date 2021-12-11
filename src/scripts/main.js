@@ -24,8 +24,6 @@ let previous = 0;
 let frameDuration = 1000/fps;
 let lag = 0;
 
-
-
 const paddleHeight = 10;
 const paddleWidth = 75;
 let paddleX = (canvas.width-paddleWidth) / 2;
@@ -97,25 +95,6 @@ function keyUpHandler(e) {
   }
 }
 
-function collisionDetection() {
-  for (let i = 0; i < brickColumnCount; i++) {
-    for (let j = 0; j < brickRowCount; j++) {
-      let b = bricks[i][j];
-      if (b.status == 1) {
-        if (x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
-          dy = -dy;
-          b.status = 0;
-          score++;
-          if (score == brickRowCount*brickColumnCount) {
-            alert("YOU WIN, CONGRATULATIONS!");
-            document.location.reload();
-          }
-        }
-      }
-    }
-  }
-}
-
 function drawScore() {
   ctx.font = "16px Arial";
   ctx.fillStyle = "#0095DD";
@@ -170,60 +149,6 @@ function drawBricks() {
   }
 }
 
-function update() {
-  collisionDetection();
-
-  if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
-    dx = -dx;
-  }
-
-  if (y + dy < ballRadius) {
-    dy = -dy;
-  } else if (y + dy > canvas.height-ballRadius) {
-    if (x > paddleX && x < paddleX + paddleWidth) {
-      dy = -dy;
-    } else {
-      lives--;
-      if(!lives) {
-        alert("GAME OVER");
-        document.location.reload();
-      } else {
-        x = canvas.width/2;
-        y = canvas.height-30;
-        dx = ballSpd;
-        dy = -ballSpd;
-        paddleX = (canvas.width-paddleWidth)/2;
-      }
-    }
-  }
-
-  x += dx;
-  y += dy;
-
-  if(rightPressed) {
-    paddleX += paddleSpd;
-    if (paddleX + paddleWidth > canvas.width){
-        paddleX = canvas.width - paddleWidth;
-    }
-  }
-  else if(leftPressed) {
-    paddleX -= paddleSpd;
-    if (paddleX < 0){
-        paddleX = 0;
-    }
-  }
-}
-
-function renderWithInterpolation(lagOffset) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  drawBall(lagOffset);
-  drawBricks();
-  drawPaddle(lagOffset);
-  drawScore();
-  drawLives();
-}
-
 draw();
 
 function draw(timestamp) {
@@ -233,22 +158,76 @@ function draw(timestamp) {
     timestamp = 0;
   }
   let elapsed = timestamp - previous;
-
   if (elapsed > 1000) {
     elapsed = frameDuration;
   }
   lag += elapsed;
 
   while (lag >= frameDuration) {
-    update();
+    for (let i = 0; i < brickColumnCount; i++) {
+      for (let j = 0; j < brickRowCount; j++) {
+        let b = bricks[i][j];
+        if (b.status == 1) {
+          if (x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+            dy = -dy;
+            b.status = 0;
+            score++;
+            if (score == brickRowCount*brickColumnCount) {
+              alert("YOU WIN, CONGRATULATIONS!");
+              document.location.reload();
+            }
+          }
+        }
+      }
+    }
+    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+      dx = -dx;
+    }
+    if (y + dy < ballRadius) {
+      dy = -dy;
+    } else if (y + dy > canvas.height-ballRadius) {
+      if (x > paddleX && x < paddleX + paddleWidth) {
+        dy = -dy;
+      } else {
+        lives--;
+        if(!lives) {
+          alert("GAME OVER");
+          document.location.reload();
+        } else {
+          x = canvas.width/2;
+          y = canvas.height-30;
+          dx = ballSpd;
+          dy = -ballSpd;
+          paddleX = (canvas.width-paddleWidth)/2;
+        }
+      }
+    }
+    x += dx;
+    y += dy;
+    if(rightPressed) {
+      paddleX += paddleSpd;
+      if (paddleX + paddleWidth > canvas.width){
+          paddleX = canvas.width - paddleWidth;
+      }
+    }
+    else if(leftPressed) {
+      paddleX -= paddleSpd;
+      if (paddleX < 0){
+          paddleX = 0;
+      }
+    }
     lag -= frameDuration;
   }
-  let lagOffset = lag / frameDuration;
 
+  let lagOffset = lag / frameDuration;
   if (timestamp >= renderStart) {
-    renderWithInterpolation(lagOffset);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBall(lagOffset);
+    drawBricks();
+    drawPaddle(lagOffset);
+    drawScore();
+    drawLives();
     renderStart = timestamp + renderFrameDuration;
   }
-
   previous = timestamp;
 }
