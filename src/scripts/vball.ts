@@ -1,7 +1,9 @@
-const canvas = document.getElementById("game-window");
+const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 600;
 canvas.height = 300;
+canvas.id = "game-window";
+document.body.appendChild(canvas);
 
 //Select FPS to suit display
 document.getElementById("fps-select").addEventListener("click", onSelectFPS);
@@ -49,6 +51,19 @@ function keyUpHandler(e) {
   }
 }
 
+//Ball Object Constructor
+function oBall(px, py, vx, vy, ax, ay, radius, mass, id) {
+  this.px = px;
+  this.py = py;
+  this.vx = vx;
+  this.vy = vy;
+  this.ax = ax;
+  this.ay = ay;
+  this.radius = radius;
+  this.mass = mass;
+  this.id = id;
+}
+
 let leftPressed = false;
 let rightPressed = false;
 
@@ -56,13 +71,17 @@ let renderFps = 60;
 let renderStart = 0;
 let renderFrameDuration = 1000/renderFps;
 
-const fps = 60;
+const simFps = 60;
 let previous = 0; 
-const frameDuration = 1000/fps;
+const simFrameDuration = 1000/simFps;
 let lag = 0;
 
+const players = [];
+
+
+
 //Game Loop
-draw();
+draw(null);
 
 function draw(timestamp) {
   requestAnimationFrame(draw);
@@ -72,20 +91,20 @@ function draw(timestamp) {
   }
   let elapsed = timestamp - previous;
   if (elapsed > 1000) {
-    elapsed = frameDuration;
+    elapsed = simFrameDuration;
   }
   lag += elapsed;
 
   //Logic
-  while (lag >= frameDuration) {
-    update();
-    lag -= frameDuration;
+  while (lag >= simFrameDuration) {
+    //update();
+    lag -= simFrameDuration;
   }
   
   //Rendering
-  let lagOffset = lag / frameDuration;
+  let lagOffset = lag / simFrameDuration;
   if (timestamp >= renderStart) {
-    renderWithInterpolation(lagOffset);
+    //renderWithInterpolation(lagOffset);
     renderStart = timestamp + renderFrameDuration;
   }
   previous = timestamp;

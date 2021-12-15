@@ -1,3 +1,4 @@
+/*
 const canvas = document.getElementById("game-window");
 
 const ctx = canvas.getContext("2d");
@@ -231,3 +232,4 @@ function draw(timestamp) {
   }
   previous = timestamp;
 }
+*/
