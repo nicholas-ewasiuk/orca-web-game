@@ -52,16 +52,16 @@ function keyUpHandler(e) {
 }
 
 //Ball Object Constructor
-function oBall(px, py, vx, vy, ax, ay, radius, mass, id) {
-  this.px = px;
-  this.py = py;
-  this.vx = vx;
-  this.vy = vy;
-  this.ax = ax;
-  this.ay = ay;
-  this.radius = radius;
-  this.mass = mass;
-  this.id = id;
+type Ball = {
+  px: number; 
+  py: number; 
+  vx: number;
+  vy: number;
+  ax: number;
+  ay: number;
+  radius: number;
+  mass: number;
+  id: string;
 }
 
 let leftPressed = false;
@@ -76,8 +76,33 @@ let previous = 0;
 const simFrameDuration = 1000/simFps;
 let lag = 0;
 
-const players = [];
+//hard coded players for now
+const playerOne: Ball = {
+  px: canvas.width/4, 
+  py: canvas.height-10, 
+  vx: 0,
+  vy: 0,
+  ax: 0,
+  ay: 0,
+  radius: 10,
+  mass: 10,
+  id: "player1"
+}
 
+const playerTwo: Ball = {
+  px: canvas.width*3/4, 
+  py: canvas.height-10, 
+  vx: 0,
+  vy: 0,
+  ax: 0,
+  ay: 0,
+  radius: 10,
+  mass: 10,
+  id: "player2"
+}
+
+const players = [playerOne, playerTwo];
+console.log(players);
 
 
 //Game Loop
@@ -97,14 +122,35 @@ function draw(timestamp) {
 
   //Logic
   while (lag >= simFrameDuration) {
-    //update();
+    //Update Positions
+    
+
+    //Static Collisions
+
+
+    //Dynamic Collisions
+
     lag -= simFrameDuration;
   }
   
   //Rendering
   let lagOffset = lag / simFrameDuration;
   if (timestamp >= renderStart) {
-    //renderWithInterpolation(lagOffset);
+
+    console.clear();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //Draw Players
+    for (let i = 0; i < players.length; i++) {
+      ctx.beginPath();
+      ctx.arc(players[i].px, players[i].py, players[i].radius, 0, Math.PI*2);
+      console.log(players[i].px);
+      ctx.fillStyle = "#0095DD";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+
     renderStart = timestamp + renderFrameDuration;
   }
   previous = timestamp;
