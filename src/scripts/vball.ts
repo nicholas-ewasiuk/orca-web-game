@@ -1,7 +1,7 @@
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 600;
-canvas.height = 300;
+canvas.width = 900;
+canvas.height = 600;
 canvas.id = "game-window";
 document.body.appendChild(canvas);
 
@@ -65,8 +65,8 @@ type Ball = {
   vy: number;
   ax: number;
   ay: number;
-  radius: number;
-  mass: number;
+  radius: number; //1px = 1cm
+  mass: number; //kg
   id: string;
 }
 
@@ -84,9 +84,12 @@ const simFrameDuration = 1000/simFps;
 let lag = 0;
 
 const ground = canvas.height;
-const gravity = 40/1000;
-const pSpd = 0.2;
-const pRad = 30;
+const Cd = 0.47; // Unitless
+const rho = 1.22; // kg/m^3
+const ag = 9.8; // m/s^2
+const pSpd = 0.2; // m/s
+const pRad = 30; // 1px = 1cm
+const A = Math.PI * pRad * pRad / (10000); // m^2
 
 //hard coded players for now
 const playerOne: Ball = {
@@ -150,33 +153,44 @@ function draw(timestamp) {
     //Update player positions. Right now crudely just for player1.
     if (players[0].py >= ground-players[0].radius) {
       if (upPressed) {
-        players[0].vy -= 2;
+        //players[0].vy -= 2;
+        gameBall.vy -= pSpd;
       }
     }
     if (rightPressed) {
-      players[0].vx += pSpd;
+      //players[0].vx += pSpd;
+      gameBall.vx += pSpd;
     }
     if (leftPressed) {
-      players[0].vx -= pSpd;
+      //players[0].vx -= pSpd;
+      gameBall.vx -= pSpd;
     }
 
     for (let i = 0; i < players.length; i++) {
 
-      players[i].vx += players[i].ax;
-      players[i].px += players[i].vx;
+      players[i].vx += players[i].ax/simFps;
+      players[i].px += players[i].vx/simFps*100;
 
-      players[i].vy += gravity;
-      players[i].vy += players[i].ay;
-      players[i].py += players[i].vy;
+      players[i].vy += ag/simFps;
+      players[i].vy += players[i].ay/simFps;
+      players[i].py += players[i].vy/simFps*100;
     }
 
     //Update ball position
-    gameBall.vx += gameBall.ax;
-    gameBall.px += gameBall.vx;
+    let FxBall = -0.5 * Cd * A * rho * gameBall.vx * gameBall.vx * gameBall.vx/Math.abs(gameBall.vx);
+    let FyBall = -0.5 * Cd * A * rho * gameBall.vy * gameBall.vy * gameBall.vy/Math.abs(gameBall.vy);
 
-    gameBall.vy += gravity;
-    gameBall.vy += gameBall.ay;
-    gameBall.py += gameBall.vy;
+    FxBall = (isNaN(FxBall) ? 0 : FxBall);
+    FyBall = (isNaN(FyBall) ? 0 : FyBall);
+
+    gameBall.ax = FxBall / gameBall.mass;
+    gameBall.ay = ag + (FyBall / gameBall.mass);
+
+    gameBall.vx += gameBall.ax/simFps;
+    gameBall.vy += gameBall.ay/simFps;
+
+    gameBall.px += gameBall.vx/simFps*100;
+    gameBall.py += gameBall.vy/simFps*100;
 
     //Static Collisions
     for (let i = 0; i < players.length; i++) {
