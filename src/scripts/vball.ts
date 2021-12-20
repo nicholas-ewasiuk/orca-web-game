@@ -194,9 +194,21 @@ function draw(timestamp) {
 
     //Static Collisions
     for (let i = 0; i < players.length; i++) {
+      let deltaPx = Math.abs(gameBall.px - players[i].px);
+      let deltaPy = Math.abs(gameBall.py - players[i].py);
+      let deltaPsq = deltaPx * deltaPx + deltaPy * deltaPy;
+      let minPsq = (gameBall.radius + players[i].radius) * (gameBall.radius + players[i].radius);
+
       if (players[i].py > ground-players[i].radius) {
         players[i].py = ground-players[i].radius;
         players[i].vy = 0;
+      }
+      if (deltaPsq < minPsq) {
+        let distance = Math.sqrt(deltaPsq);
+        let overlap = 0.5 * (distance - gameBall.radius - players[i].radius);
+
+        gameBall.px -= overlap * (gameBall.px - players[i].px) / distance;
+        gameBall.py -= overlap * (gameBall.py - players[i].py) / distance;
       }
     }
     
