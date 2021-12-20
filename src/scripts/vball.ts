@@ -1,7 +1,7 @@
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 900;
-canvas.height = 600;
+canvas.width = 1200;
+canvas.height = 900;
 canvas.id = "game-window";
 document.body.appendChild(canvas);
 
@@ -42,6 +42,9 @@ function keyDownHandler(e) {
   if(e.key == "Up" || e.key == "ArrowUp") {
     upPressed = true;
   }
+  if(e.key == "Down" || e.key == "ArrowDown") {
+    downPressed = true;
+  }
 }
 
 function keyUpHandler(e) {
@@ -54,6 +57,9 @@ function keyUpHandler(e) {
   }
   if(e.key == "Up" || e.key == "ArrowUp") {
     upPressed = false;
+  }
+  if(e.key == "Down" || e.key == "ArrowDown") {
+    downPressed = false;
   }
 }
 
@@ -73,6 +79,7 @@ type Ball = {
 let leftPressed = false;
 let rightPressed = false;
 let upPressed = false;
+let downPressed = false;
 
 let renderFps = 60;
 let renderStart = 0;
@@ -87,9 +94,12 @@ const ground = canvas.height;
 const Cd = 0.47; // Unitless
 const rho = 1.22; // kg/m^3
 const ag = 9.8; // m/s^2
+const pMass = 30 //kg
 const pSpd = 0.2; // m/s
-const pRad = 30; // 1px = 1cm
-const A = Math.PI * pRad * pRad / (10000); // m^2
+const pRad = 50; // 1px = 1cm
+const ballRad = 40;
+const pA = Math.PI * pRad * pRad / (10000); // m^2
+const ballA = Math.PI * 300 / (10000); // m^2
 
 //hard coded players for now
 const playerOne: Ball = {
@@ -100,7 +110,7 @@ const playerOne: Ball = {
   ax: 0,
   ay: 0,
   radius: pRad,
-  mass: 10,
+  mass: pMass,
   id: "player1"
 }
 
@@ -112,19 +122,19 @@ const playerTwo: Ball = {
   ax: 0,
   ay: 0,
   radius: pRad,
-  mass: 10,
+  mass: pMass,
   id: "player2"
 }
 
 const gameBall: Ball = {
   px: canvas.width/4, 
-  py: canvas.height-200, 
+  py: canvas.height-400, 
   vx: 0,
   vy: 0,
   ax: 0,
   ay: 0,
-  radius: 10,
-  mass: 1,
+  radius: ballRad,
+  mass: 0.2,
   id: "ball"
 }
 
@@ -150,35 +160,44 @@ function draw(timestamp) {
   //Logic
   while (lag >= simFrameDuration) {
     console.clear()
+    console.log(`vx: ${gameBall.vx} vy: ${gameBall.vy} ax: ${gameBall.ax} ay: ${gameBall.ay}`);
     //Update player positions. Right now crudely just for player1.
     if (players[0].py >= ground-players[0].radius) {
       if (upPressed) {
+        players[0].vy -= 4;
+      }
+      if (downPressed) {
         //players[0].vy -= 2;
-        gameBall.vy -= pSpd;
       }
     }
     if (rightPressed) {
-      //players[0].vx += pSpd;
-      gameBall.vx += pSpd;
+      players[0].vx += pSpd;
     }
     if (leftPressed) {
-      //players[0].vx -= pSpd;
-      gameBall.vx -= pSpd;
+      players[0].vx -= pSpd;
     }
 
     for (let i = 0; i < players.length; i++) {
 
-      players[i].vx += players[i].ax/simFps;
-      players[i].px += players[i].vx/simFps*100;
+      let FxPlayer = -0.5 * Cd * pA * rho * players[i].vx * players[i].vx * players[i].vx/Math.abs(players[i].vx);
+      let FyPlayer = -0.5 * Cd * pA * rho * players[i].vy * players[i].vy * players[i].vy/Math.abs(players[i].vy);
 
-      players[i].vy += ag/simFps;
+      FxPlayer = (isNaN(FxPlayer) ? 0 : FxPlayer);
+      FyPlayer = (isNaN(FyPlayer) ? 0 : FyPlayer);
+
+      players[i].ax = FxPlayer / players[i].mass;
+      players[i].ay = 5 + (FyPlayer / players[i].mass);
+
+      players[i].vx += players[i].ax/simFps;
       players[i].vy += players[i].ay/simFps;
+
+      players[i].px += players[i].vx/simFps*100;
       players[i].py += players[i].vy/simFps*100;
     }
 
     //Update ball position
-    let FxBall = -0.5 * Cd * A * rho * gameBall.vx * gameBall.vx * gameBall.vx/Math.abs(gameBall.vx);
-    let FyBall = -0.5 * Cd * A * rho * gameBall.vy * gameBall.vy * gameBall.vy/Math.abs(gameBall.vy);
+    let FxBall = -0.5 * Cd * ballA * rho * gameBall.vx * gameBall.vx * gameBall.vx/Math.abs(gameBall.vx);
+    let FyBall = -0.5 * Cd * ballA * rho * gameBall.vy * gameBall.vy * gameBall.vy/Math.abs(gameBall.vy);
 
     FxBall = (isNaN(FxBall) ? 0 : FxBall);
     FyBall = (isNaN(FyBall) ? 0 : FyBall);
@@ -192,10 +211,10 @@ function draw(timestamp) {
     gameBall.px += gameBall.vx/simFps*100;
     gameBall.py += gameBall.vy/simFps*100;
 
-    //Static Collisions
+    //Collisions
     for (let i = 0; i < players.length; i++) {
-      let deltaPx = Math.abs(gameBall.px - players[i].px);
-      let deltaPy = Math.abs(gameBall.py - players[i].py);
+      let deltaPx = players[i].px - gameBall.px;
+      let deltaPy = players[i].py - gameBall.py;
       let deltaPsq = deltaPx * deltaPx + deltaPy * deltaPy;
       let minPsq = (gameBall.radius + players[i].radius) * (gameBall.radius + players[i].radius);
 
@@ -209,15 +228,35 @@ function draw(timestamp) {
 
         gameBall.px -= overlap * (gameBall.px - players[i].px) / distance;
         gameBall.py -= overlap * (gameBall.py - players[i].py) / distance;
+
+        let nx = deltaPx / distance;
+        let ny = deltaPy / distance;
+
+        let tx = -ny;
+        let ty = nx;
+
+        let dpTan1 = gameBall.vx * tx + gameBall.vy * ty;
+        //let dpTan2 = players[i].vx * tx + players[i].vy * ty;
+
+        let dpNorm1 = gameBall.vx * nx + gameBall.vy * ny;
+        let dpNorm2 = players[i].vx * nx + players[i].vy * ny;
+
+        let m1 = (dpNorm1 * (gameBall.mass - players[i].mass) + 2.0 * players[i].mass * dpNorm2) / (gameBall.mass + players[i].mass);
+        //let m2 = (dpNorm1 * (players[i].mass - gameBall.mass) + 2.0 * gameBall.mass * dpNorm1) / (gameBall.mass + players[i].mass);
+
+        gameBall.vx = tx * dpTan1 + nx * m1;
+        gameBall.vy = ty * dpTan1 + ny * m1 * 1.5;
+        //players[i].vx = tx * dpTan2 + nx * m2;
+        //players[i].vy = ty * dpTan2 + ny * m2;
       }
     }
     
     if (gameBall.py > ground-gameBall.radius) {
-      gameBall.py = ground-gameBall.radius;
+      gameBall.py = canvas.height-400;
+      gameBall.px = canvas.width/4;
       gameBall.vy = 0;
+      gameBall.vx = 0;
     }
-
-    //Dynamic Collisions
 
     lag -= simFrameDuration;
   }
