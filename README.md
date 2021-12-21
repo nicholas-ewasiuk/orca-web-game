@@ -7,5 +7,5 @@
 <p align="center">Use arrow keys to move left, right and jump.
 </p>
 
-<p align="center">Demo at <a href="https://nicholas-ewasiuk.github.io/orca-web-game/">https://nicholas-ewasiuk.github.io/orca-web-game/</a>
+<p align="center"><a href="https://nicholas-ewasiuk.github.io/orca-web-game/">https://nicholas-ewasiuk.github.io/orca-web-game/</a>
 </p>
