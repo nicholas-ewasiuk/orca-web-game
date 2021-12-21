@@ -5,8 +5,10 @@
   "source": "src/index.html",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel",
+    "start": "parcel ./src/index.html",
+    "prebuild-dev": "shx rm -rf dist/*",
+    "build-dev": "parcel build ./src/index.html --no-minify --public-url ./",
+    "prebuild": "shx rm -rf dist/*",
     "build": "parcel build ./src/index.html --public-url ./",
     "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose"
   },
@@ -21,7 +23,8 @@
   },
   "homepage": "https://github.com/nicholas-ewasiuk/orca-web-game#readme",
   "devDependencies": {
-    "parcel": "^2.0.1"
+    "parcel": "^2.0.1",
+    "shx": "^0.3.3"
   },
   "dependencies": {
     "@solana/web3.js": "^1.31.0"
