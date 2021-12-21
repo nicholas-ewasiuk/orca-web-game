@@ -1,9 +1,13 @@
+import * as solanaWeb3 from '@solana/web3.js';
+
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 1200;
 canvas.height = 900;
 canvas.id = "game-window";
 document.body.appendChild(canvas);
+
+console.log(solanaWeb3);
 
 //Select FPS to suit display
 document.getElementById("fps-select").addEventListener("click", onSelectFPS);
@@ -95,7 +99,7 @@ const Cd = 0.47; // Unitless
 const rho = 1.22; // kg/m^3
 const ag = 9.8; // m/s^2
 const pMass = 30 //kg
-const pSpd = 0.2; // m/s
+const pSpd = 5; // m/s
 const pRad = 50; // 1px = 1cm
 const ballRad = 40;
 const pA = Math.PI * pRad * pRad / (10000); // m^2
@@ -159,8 +163,8 @@ function draw(timestamp) {
 
   //Logic
   while (lag >= simFrameDuration) {
-    console.clear()
-    console.log(`vx: ${gameBall.vx} vy: ${gameBall.vy} ax: ${gameBall.ax} ay: ${gameBall.ay}`);
+    //console.clear()
+    //console.log(`vx: ${gameBall.vx} vy: ${gameBall.vy} ax: ${gameBall.ax} ay: ${gameBall.ay}`);
     //Update player positions. Right now crudely just for player1.
     if (players[0].py >= ground-players[0].radius) {
       if (upPressed) {
@@ -171,10 +175,10 @@ function draw(timestamp) {
       }
     }
     if (rightPressed) {
-      players[0].vx += pSpd;
+      players[0].px += pSpd;
     }
     if (leftPressed) {
-      players[0].vx -= pSpd;
+      players[0].px -= pSpd;
     }
 
     for (let i = 0; i < players.length; i++) {
